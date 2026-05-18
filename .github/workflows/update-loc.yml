@@ -1,0 +1,145 @@
+name: Update Lines of Code
+
+on:
+  schedule:
+    - cron: "0 0 * * 0"
+  workflow_dispatch:
+
+jobs:
+  update-loc:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Check for commits this week
+        id: activity
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          SINCE=$(date -d '7 days ago' --utc +%Y-%m-%dT%H:%M:%SZ)
+          COUNT=$(gh api graphql -f query="
+            query {
+              user(login: \"Akendall47\") {
+                contributionsCollection(from: \"$SINCE\") {
+                  totalCommitContributions
+                }
+              }
+            }" --jq '.data.user.contributionsCollection.totalCommitContributions')
+          echo "commits=$COUNT" >> "$GITHUB_OUTPUT"
+          echo "Commits this week: $COUNT"
+
+      - name: Skip if no commits this week
+        if: steps.activity.outputs.commits == '0'
+        run: |
+          echo "No commits this week, skipping update."
+          exit 0
+
+      - uses: actions/checkout@v4
+        if: steps.activity.outputs.commits != '0'
+        with:
+          ref: main
+
+      - name: Count lines added and deleted
+        if: steps.activity.outputs.commits != '0'
+        id: loc
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ADDED=0
+          DELETED=0
+
+          # Get the user's node ID once
+          USER_ID=$(gh api graphql -f query='query { user(login: "Akendall47") { id } }' --jq '.data.user.id')
+          echo "User ID: $USER_ID"
+
+          # Get all repos via GraphQL
+          CURSOR=""
+          while true; do
+            if [ -z "$CURSOR" ]; then
+              AFTER=""
+            else
+              AFTER=", after: \"$CURSOR\""
+            fi
+
+            RESULT=$(gh api graphql -f query="
+              query {
+                user(login: \"Akendall47\") {
+                  repositories(first: 100, ownerAffiliations: OWNER${AFTER}) {
+                    pageInfo { hasNextPage endCursor }
+                    nodes { name defaultBranchRef { name } }
+                  }
+                }
+              }")
+
+            REPOS=$(echo "$RESULT" | jq -r '.data.user.repositories.nodes[] | select(.defaultBranchRef != null) | .name')
+            HAS_NEXT=$(echo "$RESULT" | jq -r '.data.user.repositories.pageInfo.hasNextPage')
+            CURSOR=$(echo "$RESULT" | jq -r '.data.user.repositories.pageInfo.endCursor')
+
+            for REPO in $REPOS; do
+              echo "Processing $REPO"
+              COMMIT_CURSOR=""
+              while true; do
+                if [ -z "$COMMIT_CURSOR" ]; then
+                  COMMIT_AFTER=""
+                else
+                  COMMIT_AFTER=", after: \"$COMMIT_CURSOR\""
+                fi
+
+                COMMIT_RESULT=$(gh api graphql -f query="
+                  query {
+                    repository(owner: \"Akendall47\", name: \"$REPO\") {
+                      defaultBranchRef {
+                        target {
+                          ... on Commit {
+                            history(first: 100, author: { id: \"$USER_ID\" }${COMMIT_AFTER}) {
+                              pageInfo { hasNextPage endCursor }
+                              nodes { additions deletions }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }" 2>/dev/null)
+
+                PAGE_STATS=$(echo "$COMMIT_RESULT" | jq -r '.data.repository.defaultBranchRef.target.history.nodes[] | "\(.additions) \(.deletions)"' 2>/dev/null \
+                  | awk '{a+=$1; d+=$2} END {print a" "d}')
+                PA=$(echo "$PAGE_STATS" | awk '{print $1}')
+                PD=$(echo "$PAGE_STATS" | awk '{print $2}')
+                ADDED=$((ADDED + ${PA:-0}))
+                DELETED=$((DELETED + ${PD:-0}))
+
+                COMMIT_HAS_NEXT=$(echo "$COMMIT_RESULT" | jq -r '.data.repository.defaultBranchRef.target.history.pageInfo.hasNextPage' 2>/dev/null)
+                COMMIT_CURSOR=$(echo "$COMMIT_RESULT" | jq -r '.data.repository.defaultBranchRef.target.history.pageInfo.endCursor' 2>/dev/null)
+                [ "$COMMIT_HAS_NEXT" != "true" ] && break
+              done
+            done
+
+            [ "$HAS_NEXT" != "true" ] && break
+          done
+
+          # Format with commas
+          FMT_ADDED=$(printf "%'.f" "$ADDED" 2>/dev/null || echo "$ADDED")
+          FMT_DELETED=$(printf "%'.f" "$DELETED" 2>/dev/null || echo "$DELETED")
+
+          echo "added=$FMT_ADDED" >> "$GITHUB_OUTPUT"
+          echo "deleted=$FMT_DELETED" >> "$GITHUB_OUTPUT"
+
+      - name: Update README
+        if: steps.activity.outputs.commits != '0'
+        run: |
+          ADDED="${{ steps.loc.outputs.added }}"
+          DELETED="${{ steps.loc.outputs.deleted }}"
+          LINE="\`+${ADDED}  −${DELETED}  lines\`"
+          sed -i "/<!--START_SECTION:loc-->/,/<!--END_SECTION:loc-->/ {
+            /<!--START_SECTION:loc-->/! {/<!--END_SECTION:loc-->/! d}
+          }" README.md
+          sed -i "s|<!--START_SECTION:loc-->|<!--START_SECTION:loc-->\n${LINE}|" README.md
+
+      - name: Commit and push
+        if: steps.activity.outputs.commits != '0'
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: update lines of code"
+          file_pattern: README.md
+          push_options: --force-with-lease

@@ -1,0 +1,54 @@
+name: Generate Contribution Snake
+
+on:
+  schedule:
+    - cron: "0 0 * * 0"
+  workflow_dispatch:
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Check for commits this week
+        id: activity
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          SINCE=$(date -d '7 days ago' --utc +%Y-%m-%dT%H:%M:%SZ)
+          COUNT=$(gh api graphql -f query="
+            query {
+              user(login: \"Akendall47\") {
+                contributionsCollection(from: \"$SINCE\") {
+                  totalCommitContributions
+                }
+              }
+            }" --jq '.data.user.contributionsCollection.totalCommitContributions')
+          echo "commits=$COUNT" >> "$GITHUB_OUTPUT"
+          echo "Commits this week: $COUNT"
+
+      - name: Skip if no commits this week
+        if: steps.activity.outputs.commits == '0'
+        run: |
+          echo "No commits this week, skipping update."
+          exit 0
+
+      - uses: actions/checkout@v4
+        if: steps.activity.outputs.commits != '0'
+
+      - name: Generate snake SVG
+        if: steps.activity.outputs.commits != '0'
+        uses: Platane/snk@v3
+        with:
+          github_user_name: ${{ github.repository_owner }}
+          outputs: |
+            dist/github-snake-dark.svg?palette=github-dark&color_snake=#ffb347&color_dots=#c1121f,#d45a1a,#e67e22,#f0a500,#ffb347
+
+      - name: Commit and push
+        if: steps.activity.outputs.commits != '0'
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: update contribution snake"
+          file_pattern: dist/github-snake-dark.svg
