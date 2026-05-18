@@ -1,0 +1,134 @@
+<svg width="100%" viewBox="0 0 680 175" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .px-sm { font-family: "Courier New", "Courier", monospace; font-size: 8px; font-weight: bold; letter-spacing: 1px; }
+      .px-hd { font-family: "Courier New", "Courier", monospace; font-size: 9px; font-weight: bold; letter-spacing: 1.5px; }
+      @media (prefers-color-scheme: light) { .badge-text { fill: #1a1a1a; } }
+      @media (prefers-color-scheme: dark)  { .badge-text { fill: #ffffff; } }
+    </style>
+  </defs>
+
+  <!-- Column 1: Languages -->
+  <rect x="16" y="16" width="148" height="16" fill="#c1121f"/>
+  <rect x="16" y="14" width="148" height="2"  fill="#ff4444"/>
+  <rect x="16" y="32" width="148" height="2"  fill="#7a0000"/>
+  <text class="px-hd" x="90" y="27" text-anchor="middle" fill="white">LANGUAGES</text>
+  <rect x="16" y="16" width="4" height="4" fill="#ff4444"/>
+  <rect x="160" y="16" width="4" height="4" fill="#ff4444"/>
+
+  <rect x="16" y="40" width="148" height="20" fill="#c1121f" opacity="0.9"/>
+  <rect x="16" y="38" width="148" height="2" fill="#ff6666" opacity="0.6"/>
+  <text class="px-sm badge-text" x="24" y="53">C</text>
+
+  <rect x="16" y="66" width="148" height="20" fill="#c1121f" opacity="0.78"/>
+  <rect x="16" y="64" width="148" height="2" fill="#ff6666" opacity="0.5"/>
+  <text class="px-sm badge-text" x="24" y="79">C++</text>
+
+  <rect x="16" y="92" width="148" height="20" fill="#c1121f" opacity="0.66"/>
+  <rect x="16" y="90" width="148" height="2" fill="#ff6666" opacity="0.4"/>
+  <text class="px-sm badge-text" x="24" y="105">PYTHON</text>
+
+  <rect x="16" y="118" width="148" height="20" fill="#c1121f" opacity="0.54"/>
+  <rect x="16" y="116" width="148" height="2" fill="#ff6666" opacity="0.3"/>
+  <text class="px-sm badge-text" x="24" y="131">MATLAB</text>
+
+  <rect x="16" y="144" width="148" height="20" fill="#c1121f" opacity="0.42"/>
+  <rect x="16" y="142" width="148" height="2" fill="#ff6666" opacity="0.2"/>
+  <text class="px-sm badge-text" x="24" y="157">BASH</text>
+
+  <rect x="16" y="160" width="4" height="4" fill="#7a0000"/>
+  <rect x="160" y="160" width="4" height="4" fill="#7a0000"/>
+
+  <!-- Column 2: Hardware -->
+  <rect x="180" y="16" width="148" height="16" fill="#d45a1a"/>
+  <rect x="180" y="14" width="148" height="2"  fill="#ff8844"/>
+  <rect x="180" y="32" width="148" height="2"  fill="#7a2a00"/>
+  <text class="px-hd" x="254" y="27" text-anchor="middle" fill="white">HARDWARE</text>
+  <rect x="180" y="16" width="4" height="4" fill="#ff8844"/>
+  <rect x="324" y="16" width="4" height="4" fill="#ff8844"/>
+
+  <rect x="180" y="40" width="148" height="20" fill="#d45a1a" opacity="0.9"/>
+  <rect x="180" y="38" width="148" height="2" fill="#ff8844" opacity="0.6"/>
+  <text class="px-sm badge-text" x="188" y="53">SYSTEMVERILOG</text>
+
+  <rect x="180" y="66" width="148" height="20" fill="#d45a1a" opacity="0.75"/>
+  <rect x="180" y="64" width="148" height="2" fill="#ff8844" opacity="0.5"/>
+  <text class="px-sm badge-text" x="188" y="79">VIVADO</text>
+
+  <rect x="180" y="92" width="148" height="20" fill="#d45a1a" opacity="0.60"/>
+  <rect x="180" y="90" width="148" height="2" fill="#ff8844" opacity="0.4"/>
+  <text class="px-sm badge-text" x="188" y="105">PYNQ</text>
+
+  <rect x="180" y="118" width="148" height="20" fill="#d45a1a" opacity="0.45"/>
+  <rect x="180" y="116" width="148" height="2" fill="#ff8844" opacity="0.3"/>
+  <text class="px-sm badge-text" x="188" y="131">FLEX / YACC</text>
+
+  <rect x="180" y="144" width="148" height="20" fill="#d45a1a" opacity="0.32"/>
+  <rect x="180" y="142" width="148" height="2" fill="#ff8844" opacity="0.2"/>
+  <text class="px-sm badge-text" x="188" y="157">CIRCUIT DESIGN</text>
+
+  <rect x="180" y="160" width="4" height="4" fill="#7a2a00"/>
+  <rect x="324" y="160" width="4" height="4" fill="#7a2a00"/>
+
+  <!-- Column 3: Libraries -->
+  <rect x="344" y="16" width="148" height="16" fill="#e67e22"/>
+  <rect x="344" y="14" width="148" height="2"  fill="#ffaa44"/>
+  <rect x="344" y="32" width="148" height="2"  fill="#8a4400"/>
+  <text class="px-hd" x="418" y="27" text-anchor="middle" fill="white">LIBRARIES</text>
+  <rect x="344" y="16" width="4" height="4" fill="#ffaa44"/>
+  <rect x="488" y="16" width="4" height="4" fill="#ffaa44"/>
+
+  <rect x="344" y="40" width="148" height="20" fill="#e67e22" opacity="0.9"/>
+  <rect x="344" y="38" width="148" height="2" fill="#ffaa44" opacity="0.6"/>
+  <text class="px-sm badge-text" x="352" y="53">PTHREADS</text>
+
+  <rect x="344" y="66" width="148" height="20" fill="#e67e22" opacity="0.76"/>
+  <rect x="344" y="64" width="148" height="2" fill="#ffaa44" opacity="0.5"/>
+  <text class="px-sm badge-text" x="352" y="79">BOOST / POSIX</text>
+
+  <rect x="344" y="92" width="148" height="20" fill="#e67e22" opacity="0.62"/>
+  <rect x="344" y="90" width="148" height="2" fill="#ffaa44" opacity="0.4"/>
+  <text class="px-sm badge-text" x="352" y="105">NUMPY / POLARS</text>
+
+  <rect x="344" y="118" width="148" height="20" fill="#e67e22" opacity="0.48"/>
+  <rect x="344" y="116" width="148" height="2" fill="#ffaa44" opacity="0.3"/>
+  <text class="px-sm badge-text" x="352" y="131">OPENCV</text>
+
+  <rect x="344" y="144" width="148" height="20" fill="#e67e22" opacity="0.34"/>
+  <rect x="344" y="142" width="148" height="2" fill="#ffaa44" opacity="0.2"/>
+  <text class="px-sm badge-text" x="352" y="157">CMAKE / OPENMP</text>
+
+  <rect x="344" y="160" width="4" height="4" fill="#8a4400"/>
+  <rect x="488" y="160" width="4" height="4" fill="#8a4400"/>
+
+  <!-- Column 4: Cloud -->
+  <rect x="508" y="16" width="156" height="16" fill="#f0a500"/>
+  <rect x="508" y="14" width="156" height="2"  fill="#ffcc44"/>
+  <rect x="508" y="32" width="156" height="2"  fill="#8a5c00"/>
+  <text class="px-hd" x="586" y="27" text-anchor="middle" fill="white">CLOUD / DB</text>
+  <rect x="508" y="16" width="4" height="4" fill="#ffcc44"/>
+  <rect x="660" y="16" width="4" height="4" fill="#ffcc44"/>
+
+  <rect x="508" y="40" width="156" height="20" fill="#f0a500" opacity="0.9"/>
+  <rect x="508" y="38" width="156" height="2" fill="#ffcc44" opacity="0.6"/>
+  <text class="px-sm badge-text" x="516" y="53">AWS</text>
+
+  <rect x="508" y="66" width="156" height="20" fill="#f0a500" opacity="0.76"/>
+  <rect x="508" y="64" width="156" height="2" fill="#ffcc44" opacity="0.5"/>
+  <text class="px-sm badge-text" x="516" y="79">S3</text>
+
+  <rect x="508" y="92" width="156" height="20" fill="#f0a500" opacity="0.62"/>
+  <rect x="508" y="90" width="156" height="2" fill="#ffcc44" opacity="0.4"/>
+  <text class="px-sm badge-text" x="516" y="105">DYNAMODB</text>
+
+  <rect x="508" y="118" width="156" height="20" fill="#f0a500" opacity="0.48"/>
+  <rect x="508" y="116" width="156" height="2" fill="#ffcc44" opacity="0.3"/>
+  <text class="px-sm badge-text" x="516" y="131">REDIS</text>
+
+  <rect x="508" y="144" width="156" height="20" fill="#f0a500" opacity="0.34"/>
+  <rect x="508" y="142" width="156" height="2" fill="#ffcc44" opacity="0.2"/>
+  <text class="px-sm badge-text" x="516" y="157">MYSQL / BOTO3</text>
+
+  <rect x="508" y="160" width="4" height="4" fill="#8a5c00"/>
+  <rect x="660" y="160" width="4" height="4" fill="#8a5c00"/>
+</svg>
