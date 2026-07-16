@@ -16,9 +16,6 @@
    - Multiplayer/Node Raycasting on FPGA using PYNQ dev-board
    - Staged async server and database-backed telemetry & development engine
 
-#### Interests:
-FPGAs · Embedded Systems · RTL Design · Energy Storage Systems · Data Analytics · Computer Vision · Control Theory · Computer Architecture · Performance Engineering · Signal Processing · Data Engineering
-
 ---
 
 ## Tech Stacks
