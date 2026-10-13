@@ -6,8 +6,8 @@
 
 - Studying Electronics and Computer Engineering at `Imperial College London`
 - Industry experience:
-  - RF Electronic Engineering and Signal Analysis at `ETL Systems`
-  - Aerospace Electronics, Control and Hydrogen Engineering at `GKN Aerospace`
+  - RF Electronic Engineering, Signal and Data Analysis at `ETL Systems`
+  - Aerospace Electronics, Control Algorithm and Hydrogen Development Engineering at `GKN Aerospace`
 
 **Currently building:**
 - `ComPilates: A Flexible C Compiler`: Full pipeline from lexer to RISC-V codegen
