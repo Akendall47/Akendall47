@@ -1,0 +1,40 @@
+name: Generate Contribution Pipeline
+
+on:
+  schedule:
+    - cron: "30 0 * * 0" # after the snake job, so the two pushes do not race
+  workflow_dispatch:
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch contribution calendar
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api graphql -f login="${{ github.repository_owner }}" -f query='
+            query($login: String!) {
+              user(login: $login) {
+                contributionsCollection {
+                  contributionCalendar {
+                    totalContributions
+                    weeks { contributionDays { contributionLevel weekday } }
+                  }
+                }
+              }
+            }' > "$RUNNER_TEMP/calendar.json"
+
+      - name: Generate pipeline SVG
+        run: python3 scripts/pipeline_svg.py "$RUNNER_TEMP/calendar.json" dist/github-pipeline.svg
+
+      - name: Commit and push
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: update contribution pipeline"
+          file_pattern: dist/github-pipeline.svg
