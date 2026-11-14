@@ -22,7 +22,7 @@
 ## Tech Stacks
 
 <p align="center">
-  <img src="./tech_stack_8bit_v3.svg" alt="Tech Stack" />
+  <img src="./dist/tech-stack.svg" alt="Tech stack, drawn as a SIMT warp of four threads" />
 </p>
 
 >
