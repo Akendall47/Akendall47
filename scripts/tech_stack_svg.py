@@ -27,14 +27,16 @@ ROW_OPACITY = [0.92, 0.8, 0.68, 0.56, 0.44]
 
 # The kernel: (instruction, register written or None, active mask, SIMT stack under the active mask).
 ALL, EVEN, ODD = (0, 1, 2, 3), (0, 2), (1, 3)
+JMP = "jmp"
 PROGRAM = [
-    ("r0 <= a[tid]", 0, ALL, []),
-    ("r1 <= b[tid]", 1, ALL, []),
+    ("r0 <= a + tid", 0, ALL, []),  # ALU results, so the value really does come out of the ALU
+    ("r1 <= b + tid", 1, ALL, []),
     ("br tid[0]", None, ALL, []),  # odd threads take the branch: the warp diverges
-    ("r2 <= c[tid]", 2, EVEN, [ODD, ALL]),  # fall-through path; the taken path and the full mask wait
-    ("r2 <= d[tid]", 2, ODD, [ALL]),  # taken path, popped at the reconvergence point
-    ("r3 <= e[tid]", 3, ALL, []),  # reconverged
-    ("r4 <= f[tid]", 4, ALL, []),
+    ("r2 <= c + tid", 2, EVEN, [ODD, ALL]),  # fall-through path; the taken path and the full mask wait
+    (JMP, None, EVEN, [ODD, ALL]),  # over the taken path's code, to the reconvergence point
+    ("r2 <= d + tid", 2, ODD, [ALL]),  # taken path, popped at the reconvergence point
+    ("r3 <= e + tid", 3, ALL, []),  # reconverged
+    ("r4 <= f + tid", 4, ALL, []),
 ]
 DONE = "ret"
 
@@ -227,7 +229,8 @@ def render():
         mine = [w for w in writes if i in w[1]]
         idle = [(s, on if i in mask else "opacity:.3") for s, (_, _, mask, _) in zip(start, PROGRAM)] + [(start[-1], on)]
         dim = animate(f"d{i}", switch(f"d{i}", on, idle, loop))  # a masked thread sits the instruction out
-        execute = [(s + 2 * T, s + 3 * T) for s, (_, _, mask, _) in zip(start, PROGRAM) if i in mask]
+        execute = [(s + 2 * T, s + 3 * T) for s, (ir, _, mask, _) in zip(start, PROGRAM)
+                   if i in mask and ir != JMP]  # a jump only moves the PC: no per-thread arithmetic
         part = [f'<g class="{dim}"><path class="w body" d="{alu}"/><path class="w" d="{rail}"/>'
                 f'<text class="m" x="{num(alu_x)}" y="{ALU_Y + 21}">ALU</text>'
                 f'<text x="{num(alu_x + 30)}" y="{ALU_Y + 17}">THREAD {i}</text></g>',
