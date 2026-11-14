@@ -20,7 +20,6 @@ CREDIT = "CPU pipeline contribution graph by Archie Kendall, https://github.com/
 
 LEVELS = ["NONE", "FIRST_QUARTILE", "SECOND_QUARTILE", "THIRD_QUARTILE", "FOURTH_QUARTILE"]
 PALETTE = ["#c1121f", "#d45a1a", "#e67e22", "#ffb347"]  # contribution levels 1-4
-STAGES = ["FETCH", "DECODE", "EXECUTE", "MEMORY", "WRITE BACK"]
 STAGE_COLORS = ["#c1121f", "#cf481b", "#dd6c1e", "#e9881a", "#f0a500"]
 CAPTIONS = ["ir <= log[pc]", "n <= count(ir)", "acc <= acc + n", "cache[pc] <= ir", "total <= acc"]
 LATCHES = ["PC", "IF/ID", "ID/EX", "EX/MEM", "MEM/WB"]
@@ -29,17 +28,17 @@ HALF = [23, 18, 20, 23, 42]  # half width of each stage's symbol
 MONTHS = "JAN FEB MAR APR MAY JUN JUL AUG SEP OCT NOV DEC".split()
 
 # geometry, px
-W, H = 880, 292
+W, H = 880, 276
 CELL, PITCH, RX = 11, 15, 2
 COL_H = 6 * PITCH + CELL
 MINI = 0.6  # scale of a week inside the pipeline
 PACKET = 0.14  # vertical squash of a week while it rides the write bus
-BAR_Y, BAR_H = 4, 15
-LATCH_W, LATCH_H, LATCH_Y = 18, 74, 36
+CAP_Y = 12  # baseline of the stage captions
+LATCH_W, LATCH_H, LATCH_Y = 18, 74, 20
 MID = LATCH_Y + LATCH_H / 2  # height of the datapath wire
 RAIL_Y = LATCH_Y + LATCH_H + 8  # clock rail
-BUS_Y = 146  # write bus above the cache
-GRID_Y = 156
+BUS_Y = 130  # write bus above the cache
+GRID_Y = 140
 
 # timing, s
 T = 0.45  # clock period
@@ -134,7 +133,6 @@ def render(calendar):
         "@media(prefers-color-scheme:light){:root{--fg:#24292f;--wire:#6e7781;--acc:#d45a1a}}",
         'text{font:bold 8px "Courier New",Courier,monospace;letter-spacing:1.2px;fill:var(--wire)}',
         ".m{text-anchor:middle}.r{text-anchor:end}",
-        ".hd{font-size:9px;letter-spacing:1.5px;fill:#fff}",
         ".cap{letter-spacing:.4px}",
         ".num{font-size:13px;letter-spacing:1.5px;fill:var(--acc);opacity:0}.nf{opacity:1}",
         ".w,.hot,.clk{fill:none;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round}",
@@ -147,23 +145,22 @@ def render(calendar):
         ".e{fill:var(--wire);opacity:.12}.l0{fill:var(--wire);opacity:.2}",
         "".join(f".l{i + 1}{{fill:url(#l{i + 1})}}" for i in range(4)),
         ".fl{fill:#fff;opacity:0}.ptr{fill:var(--acc);stroke:var(--acc);opacity:0}",
-        ".b{opacity:.4}.p,.g{opacity:0}",
-        f".t,.g,.b,.ptr,.z{{animation:{run};animation-delay:-{num(lead)}s}}",
+        ".p,.g{opacity:0}",
+        f".t,.g,.ptr,.z{{animation:{run};animation-delay:-{num(lead)}s}}",
         f".p,.fl,.n{{animation:{run}}}",
         ".g,.n,.z{animation-timing-function:step-end}",
         ".p{animation-name:p}.fl{animation-name:fl}.n{animation-name:n}",
         # Without animation every week sits at its stored position: a plain, full graph.
-        "@media(prefers-reduced-motion:reduce){.t,.p,.g,.b,.fl,.n,.ptr,.hot,.clk{animation:none}}",
+        "@media(prefers-reduced-motion:reduce){.t,.p,.g,.fl,.n,.ptr,.hot,.clk{animation:none}}",
     ]
     defs = [bevel(f"l{i + 1}", c, 0.18) for i, c in enumerate(PALETTE)]
-    defs += [bevel(f"s{k}", c, 0.14) for k, c in enumerate(STAGE_COLORS)]
 
     # --- pipeline -----------------------------------------------------------
     wires = [f"M{num(gx0 - 24)},{MID}H{num(gx0 - 1)}M{num(gx0 - 7)},{MID - 3.5}l4,3.5l-4,3.5",
              f"M{num(gx0 - 10)},{RAIL_Y}H{num(node[4])}",  # clock rail
              f"M{num(port_x)},{MID + 25}V{BUS_Y}",  # cache write port
              f"M{num(col(0) + CELL / 2)},{BUS_Y}H{num(col(n - 1) + CELL / 2)}"]  # write bus
-    bars, static, labels, slots = [], [], [], []
+    static, labels, slots = [], [], []
     for k in range(5):
         x = stage_x[k]
         wires.append(f"M{num(node[k] + LATCH_W / 2)},{MID}H{num(x - HALF[k])}")
@@ -173,14 +170,7 @@ def render(calendar):
         static += [latch(k, "w"), symbol(k, "w body")]
         slots += [f'<rect x="{num(node[k] - mini_x)}" y="{num(mini_y + r * PITCH * MINI)}" '
                   f'width="{num(CELL * MINI)}" height="{num(CELL * MINI)}" rx="{num(RX * MINI)}"/>' for r in range(7)]
-        bar_x, bar_w = node[k] + LATCH_W / 2 + 4, span - LATCH_W - 8
-        bars.append(f'<g class="b b{k}"><rect x="{num(bar_x)}" y="{BAR_Y}" width="{num(bar_w)}" height="{BAR_H}" '
-                    f'fill="url(#s{k})"/><text class="m hd" x="{num(x)}" y="{BAR_Y + 10.5}">{STAGES[k]}</text></g>')
-        on, off = edge(k + 1) - 0.05, edge(k + 1 + n) - 0.05  # lit while the stage has work
-        css.append(f".b{k}{{animation-name:b{k}}}")
-        css.append(keyframes(f"b{k}", [(0, "opacity:.4"), (on, "opacity:.4"), (on + 0.2, "opacity:1"),
-                                       (off, "opacity:1"), (off + 0.4, "opacity:.4"), (loop, "opacity:.4")], loop))
-        labels.append(f'<text class="m cap" x="{num(x)}" y="{BAR_Y + BAR_H + 11}">{CAPTIONS[k].replace("<", "&lt;")}</text>')
+        labels.append(f'<text class="m cap" x="{num(x)}" y="{CAP_Y}">{CAPTIONS[k].replace("<", "&lt;")}</text>')
         labels.append(f'<text class="m" x="{num(node[k])}" y="{RAIL_Y + 12}">{LATCHES[k]}</text>')
         if k < 4:
             labels.append(f'<text class="m" x="{num(x + (4 if k == 2 else 0))}" y="{MID + 2.5}">{PARTS[k]}</text>')
@@ -291,7 +281,6 @@ def render(calendar):
         f"<desc>{CREDIT}</desc>",
         "<style>" + "\n".join(css) + "</style>",
         "<defs>" + "".join(defs) + "</defs>",
-        "".join(bars),
         f'<path class="w" d="{"".join(wires)}"/>',
         "".join(static),
         f'<g class="e">{"".join(slots)}{"".join(empty)}</g>',
