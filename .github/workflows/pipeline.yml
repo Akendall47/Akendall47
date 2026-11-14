@@ -2,7 +2,7 @@ name: Generate Contribution Pipeline
 
 on:
   schedule:
-    - cron: "30 0 * * 0" # after the snake job, so the two pushes do not race
+    - cron: "30 0 * * 0" # after the lines-of-code job, so the two pushes do not race
   workflow_dispatch:
 
 jobs:

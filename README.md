@@ -36,8 +36,4 @@
   <img src="./dist/github-pipeline.svg" alt="contribution graph clocked through a five-stage CPU pipeline" />
 </p>
 
-<p align="center">
-  <img src="./dist/github-snake-dark.svg" alt="contribution snake" />
-</p>
-
 ---
